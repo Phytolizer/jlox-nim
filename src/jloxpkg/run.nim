@@ -9,6 +9,7 @@ proc runPrompt* =
       let line = stdin.readLine()
       run(line)
     except EOFError:
+      stdout.writeLine("")
       break
 
 proc runFile*(path: string) =
