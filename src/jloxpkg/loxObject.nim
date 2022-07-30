@@ -20,3 +20,13 @@ proc newStringObject*(value: string): StringObject =
 
 method `$`*(obj: StringObject): string =
   obj.value
+
+type NumberObject* = ref object of LoxObject
+  value: float
+
+proc newNumberObject*(value: float): NumberObject =
+  new(result)
+  result.value = value
+
+method `$`*(obj: NumberObject): string =
+  $obj.value

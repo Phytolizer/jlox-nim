@@ -3,6 +3,8 @@ import loxObject
 import token
 import tokenType
 
+import std/strutils
+
 type Scanner* = object
   source: string
   tokens: seq[Token]
@@ -28,6 +30,12 @@ proc peek(self: Scanner): char =
     '\0'
   else:
     self.source[self.current]
+
+proc peekNext(self: Scanner): char =
+  if self.current + 1 >= self.source.len:
+    '\0'
+  else:
+    self.source[self.current + 1]
 
 proc match(self: var Scanner, expected: char): bool =
   if self.isAtEnd:
@@ -56,6 +64,17 @@ proc lexString(self: var Scanner) =
   discard self.advance()
   let value = self.source[self.start + 1..<self.current - 1]
   self.addToken(TK_STRING, newStringObject(value))
+
+proc lexNumber(self: var Scanner) =
+  while self.peek().isDigit:
+    discard self.advance()
+  if self.peek() == '.' and self.peekNext().isDigit:
+    discard self.advance()
+    while self.peek().isDigit:
+      discard self.advance()
+  let text = self.source[self.start..<self.current]
+  let value = text.parseFloat()
+  self.addToken(TK_NUMBER, newNumberObject(value))
 
 proc scanToken(self: var Scanner) =
   let c = self.advance()
@@ -121,7 +140,10 @@ proc scanToken(self: var Scanner) =
   of '"':
     self.lexString()
   else:
-    error(self.line, "Unexpected character.")
+    if c.isDigit:
+      self.lexNumber()
+    else:
+      error(self.line, "Unexpected character.")
 
 proc scanTokens*(self: var Scanner): seq[Token] =
   while not self.isAtEnd:
