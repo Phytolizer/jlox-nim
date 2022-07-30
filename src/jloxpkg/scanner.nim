@@ -23,6 +23,14 @@ proc advance(self: var Scanner): char =
   result = self.source[self.current]
   self.current += 1
 
+proc match(self: var Scanner, expected: char): bool =
+  if self.isAtEnd:
+    return false
+  if self.source[self.current] != expected:
+    return false
+  self.current += 1
+  return true
+
 proc addToken(self: var Scanner, ty: TokenType, literal: LoxObject) =
   let text = self.source[self.start..<self.current]
   let t = newToken(ty, text, literal, self.line)
@@ -54,6 +62,34 @@ proc scanToken(self: var Scanner) =
     self.addToken(TK_SEMICOLON)
   of '*':
     self.addToken(TK_STAR)
+  of '!':
+    self.addToken(
+      if self.match('='):
+        TK_BANG_EQUAL
+      else:
+        TK_BANG
+    )
+  of '=':
+    self.addToken(
+      if self.match('='):
+        TK_EQUAL_EQUAL
+      else:
+        TK_EQUAL
+    )
+  of '<':
+    self.addToken(
+      if self.match('='):
+        TK_LESS_EQUAL
+      else:
+        TK_LESS
+    )
+  of '>':
+    self.addToken(
+      if self.match('='):
+        TK_GREATER_EQUAL
+      else:
+        TK_GREATER
+    )
   else:
     error(self.line, "Unexpected character.")
 
