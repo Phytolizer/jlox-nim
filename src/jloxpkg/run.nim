@@ -1,5 +1,12 @@
+import error
+import scanner
+import sysexits
+
 proc run(source: string) =
-  discard
+  var scanner = newScanner(source)
+  let tokens = scanner.scanTokens()
+  for token in tokens:
+    echo(token)
 
 proc runPrompt* =
   while true:
@@ -11,7 +18,10 @@ proc runPrompt* =
     except EOFError:
       stdout.writeLine("")
       break
+    hadError = false
 
 proc runFile*(path: string) =
   let source = open(path, fmRead).readAll()
   run(source)
+  if hadError:
+    quit(EX_DATAERR)
