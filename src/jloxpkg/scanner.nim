@@ -3,7 +3,18 @@ import loxObject
 import token
 import tokenType
 
-import std/strutils
+from std/strutils import parseFloat
+
+proc isDigit(c: char): bool =
+  c >= '0' and c <= '9'
+
+proc isAlpha(c: char): bool =
+  c >= 'a' and c <= 'z' or
+  c >= 'A' and c <= 'Z' or
+  c == '_'
+
+proc isAlphaNumeric(c: char): bool =
+  c.isAlpha or c.isDigit
 
 type Scanner* = object
   source: string
@@ -76,6 +87,11 @@ proc lexNumber(self: var Scanner) =
   let value = text.parseFloat()
   self.addToken(TK_NUMBER, newNumberObject(value))
 
+proc lexIdentifier(self: var Scanner) =
+  while self.peek().isAlphaNumeric:
+    discard self.advance()
+  self.addToken(TK_IDENTIFIER)
+
 proc scanToken(self: var Scanner) =
   let c = self.advance()
   case c
@@ -142,6 +158,8 @@ proc scanToken(self: var Scanner) =
   else:
     if c.isDigit:
       self.lexNumber()
+    elif c.isAlpha:
+      self.lexIdentifier()
     else:
       error(self.line, "Unexpected character.")
 
