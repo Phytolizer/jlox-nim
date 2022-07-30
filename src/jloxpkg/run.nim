@@ -1,5 +1,16 @@
-proc runPrompt* =
+proc run(source: string) =
   discard
 
+proc runPrompt* =
+  while true:
+    stdout.write "> "
+    stdout.flushFile()
+    try:
+      let line = stdin.readLine()
+      run(line)
+    except EOFError:
+      break
+
 proc runFile*(path: string) =
-  discard
+  let source = open(path, fmRead).readAll()
+  run(source)
