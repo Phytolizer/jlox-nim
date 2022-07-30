@@ -4,6 +4,7 @@ import token
 import tokenType
 
 from std/strutils import parseFloat
+import std/tables
 
 proc isDigit(c: char): bool =
   c >= '0' and c <= '9'
@@ -15,6 +16,25 @@ proc isAlpha(c: char): bool =
 
 proc isAlphaNumeric(c: char): bool =
   c.isAlpha or c.isDigit
+
+const KEYWORDS = {
+  "and": TK_AND,
+  "class": TK_CLASS,
+  "else": TK_ELSE,
+  "false": TK_FALSE,
+  "for": TK_FOR,
+  "fun": TK_FUN,
+  "if": TK_IF,
+  "nil": TK_NIL,
+  "or": TK_OR,
+  "print": TK_PRINT,
+  "return": TK_RETURN,
+  "super": TK_SUPER,
+  "this": TK_THIS,
+  "true": TK_TRUE,
+  "var": TK_VAR,
+  "while": TK_WHILE,
+}.toTable
 
 type Scanner* = object
   source: string
@@ -90,7 +110,9 @@ proc lexNumber(self: var Scanner) =
 proc lexIdentifier(self: var Scanner) =
   while self.peek().isAlphaNumeric:
     discard self.advance()
-  self.addToken(TK_IDENTIFIER)
+  let text = self.source[self.start..<self.current]
+  let ty = KEYWORDS.getOrDefault(text, TK_IDENTIFIER)
+  self.addToken(ty)
 
 proc scanToken(self: var Scanner) =
   let c = self.advance()
