@@ -10,3 +10,13 @@ proc newNullObject*: NullObject =
 
 method `$`*(obj: NullObject): string =
   ""
+
+type StringObject* = ref object of LoxObject
+  value: string
+
+proc newStringObject*(value: string): StringObject =
+  new(result)
+  result.value = value
+
+method `$`*(obj: StringObject): string =
+  obj.value

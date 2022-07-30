@@ -45,6 +45,18 @@ proc addToken(self: var Scanner, ty: TokenType, literal: LoxObject) =
 proc addToken(self: var Scanner, ty: TokenType) =
   self.addToken(ty, newNullObject())
 
+proc lexString(self: var Scanner) =
+  while self.peek() != '"' and not self.isAtEnd:
+    if self.peek() == '\n':
+      self.line += 1
+    discard self.advance()
+  if self.isAtEnd():
+    error(self.line, "Unterminated string.")
+    return
+  discard self.advance()
+  let value = self.source[self.start + 1..<self.current - 1]
+  self.addToken(TK_STRING, newStringObject(value))
+
 proc scanToken(self: var Scanner) =
   let c = self.advance()
   case c
@@ -106,6 +118,8 @@ proc scanToken(self: var Scanner) =
     discard
   of '\n':
     self.line += 1
+  of '"':
+    self.lexString()
   else:
     error(self.line, "Unexpected character.")
 
