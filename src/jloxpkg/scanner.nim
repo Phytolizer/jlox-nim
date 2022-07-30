@@ -23,6 +23,12 @@ proc advance(self: var Scanner): char =
   result = self.source[self.current]
   self.current += 1
 
+proc peek(self: Scanner): char =
+  if self.isAtEnd():
+    '\0'
+  else:
+    self.source[self.current]
+
 proc match(self: var Scanner, expected: char): bool =
   if self.isAtEnd:
     return false
@@ -90,6 +96,16 @@ proc scanToken(self: var Scanner) =
       else:
         TK_GREATER
     )
+  of '/':
+    if self.match('/'):
+      while self.peek() != '\n' and not self.isAtEnd:
+        discard self.advance()
+    else:
+      self.addToken(TK_SLASH)
+  of ' ', '\r', '\t':
+    discard
+  of '\n':
+    self.line += 1
   else:
     error(self.line, "Unexpected character.")
 
