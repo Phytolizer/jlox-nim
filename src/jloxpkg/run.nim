@@ -1,6 +1,7 @@
 import error
 import scanner
 import sysexits
+import token
 
 proc run(source: string) =
   var scanner = newScanner(source)

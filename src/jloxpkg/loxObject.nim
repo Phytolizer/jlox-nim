@@ -1,3 +1,12 @@
-type LoxObject* = object of RootObj
+type LoxObject* = ref object of RootObj
 
-type NullObject* = object of LoxObject
+method `$`*(obj: LoxObject): string {.base.} =
+  discard
+
+type NullObject* = ref object of LoxObject
+
+proc newNullObject*: NullObject =
+  new(result)
+
+method `$`*(obj: NullObject): string =
+  ""
