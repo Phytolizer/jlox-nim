@@ -1,3 +1,4 @@
+import error
 import loxObject
 import token
 import tokenType
@@ -54,7 +55,7 @@ proc scanToken(self: var Scanner) =
   of '*':
     self.addToken(TK_STAR)
   else:
-    discard
+    error(self.line, "Unexpected character.")
 
 proc scanTokens*(self: var Scanner): seq[Token] =
   while not self.isAtEnd:
